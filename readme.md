@@ -8,7 +8,7 @@ TrustLink is an information and cross-reference tool. It is not an official poli
 
 - Accepts English, Hindi, and Hinglish questions.
 - Retrieves relevant sections from `data/master_vault.txt` with FAISS and multilingual embeddings.
-- Uses `Qwen/Qwen2.5-1.5B-Instruct` to format a concise answer.
+- Uses `Qwen/Qwen2.5-0.5B-Instruct` by default to format a concise answer within Streamlit Cloud memory limits.
 - Rejects unsupported or unsafe model output and falls back to verified context when possible.
 - Provides emergency guidance for queries that are outside the verified knowledge base.
 - Runs locally; no application API key is required.
@@ -86,6 +86,8 @@ python src/chatbot.py
 ```
 
 The first startup can take several minutes because the embedding and language models must be downloaded and loaded into memory.
+
+To use a larger compatible Hugging Face causal language model locally, set `TRUSTLINK_MODEL_ID` before starting Streamlit. The default model is intentionally kept small for Streamlit Community Cloud.
 
 ## Test and Evaluate
 

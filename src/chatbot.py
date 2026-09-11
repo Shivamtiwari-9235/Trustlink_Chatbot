@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 
@@ -99,7 +100,10 @@ class TrustLinkGuardrail:
 
 
 class TrustLinkChatbot:
-    def __init__(self, model_id="Qwen/Qwen2.5-1.5B-Instruct"):
+    def __init__(self, model_id=None):
+        model_id = model_id or os.getenv(
+            "TRUSTLINK_MODEL_ID", "Qwen/Qwen2.5-0.5B-Instruct"
+        )
         print("Initializing Knowledge Base...")
         self.retriever = LegalRetriever()
 
