@@ -19,7 +19,8 @@ st.set_page_config(
     layout="centered"
 )
 
-# Model aur Retriever ko cache karein taaki har click par reload na ho
+# Keep the model, embedding model, and FAISS index alive across Streamlit reruns.
+# TrustLinkChatbot constructs all three resources from this single cached factory.
 @st.cache_resource
 def load_trustlink_bot():
     return TrustLinkChatbot()
