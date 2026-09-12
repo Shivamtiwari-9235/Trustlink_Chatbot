@@ -3,7 +3,6 @@ import re
 import sys
 
 from dotenv import load_dotenv
-from groq import Groq
 
 # Load local development settings without overriding cloud environment variables.
 load_dotenv()
@@ -12,9 +11,6 @@ load_dotenv()
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
     sys.stdin.reconfigure(encoding="utf-8")
-
-from retriever import LegalRetriever
-
 
 class TrustLinkGuardrail:
     BANNED_FABRICATIONS = (
@@ -104,13 +100,19 @@ class TrustLinkGuardrail:
 class TrustLinkChatbot:
     def __init__(self, model_id=None):
         print("Initializing Knowledge Base...")
+        from retriever import LegalRetriever
+
         self.retriever = LegalRetriever()
 
         self.model_id = model_id or os.getenv(
             "TRUSTLINK_MODEL_ID", "llama-3.1-8b-instant"
         )
         self.api_key = os.getenv("GROQ_API_KEY")
-        self.client = Groq(api_key=self.api_key) if self.api_key else None
+        self.client = None
+        if self.api_key:
+            from groq import Groq
+
+            self.client = Groq(api_key=self.api_key)
         if self.client:
             print(f"Using Groq inference model ({self.model_id})...")
         else:
