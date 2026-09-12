@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: trustlink-chatbot
+    env: python
+    plan: free
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: streamlit run src/app.py --server.address 0.0.0.0 --server.port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: TRUSTLINK_MODEL_ID
+        value: llama-3.1-8b-instant

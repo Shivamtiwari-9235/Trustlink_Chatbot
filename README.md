@@ -79,13 +79,17 @@ The first startup downloads `paraphrase-multilingual-MiniLM-L12-v2` for retrieva
 
 ## Render Deployment
 
-Create a Render Web Service connected to this repository with:
+Create a Render Web Service connected to this repository with the repository root as its **Root Directory**. Leave the Root Directory field empty; do not set it to `src`.
+
+The repository includes a `render.yaml` Blueprint configuration. You can deploy from that file, or configure the service manually with:
 
 | Setting | Value |
 | --- | --- |
 | Environment | Python 3 |
 | Build command | `pip install -r requirements.txt` |
 | Start command | `streamlit run src/app.py --server.address 0.0.0.0 --server.port $PORT` |
+
+Render should use Python 3.11.11, which is pinned in `.python-version` for compatibility with the embedding and FAISS dependencies. If the service was created with a different Root Directory, update it to the repository root and trigger a **Clear build cache & deploy**.
 
 Add this environment variable in Render's Environment settings:
 
