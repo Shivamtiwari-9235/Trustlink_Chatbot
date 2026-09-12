@@ -2,15 +2,17 @@ import os
 import re
 import sys
 
-import torch
+from dotenv import load_dotenv
+from groq import Groq
+
+# Load local development settings without overriding cloud environment variables.
+load_dotenv()
 
 # Force UTF-8 stream for Windows consoles
-torch.set_num_threads(4)
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
     sys.stdin.reconfigure(encoding="utf-8")
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
 from retriever import LegalRetriever
 
 
@@ -101,23 +103,30 @@ class TrustLinkGuardrail:
 
 class TrustLinkChatbot:
     def __init__(self, model_id=None):
-        model_id = model_id or os.getenv(
-            "TRUSTLINK_MODEL_ID", "Qwen/Qwen2.5-0.5B-Instruct"
-        )
         print("Initializing Knowledge Base...")
         self.retriever = LegalRetriever()
 
-        print(f"Loading Model ({model_id})...")
-        self.tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_id,
-            dtype=torch.float32,
-            low_cpu_mem_usage=True,
-        ).to("cpu")
-        if self.tokenizer.pad_token_id is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-        self.model.eval()
+        self.model_id = model_id or os.getenv(
+            "TRUSTLINK_MODEL_ID", "llama-3.1-8b-instant"
+        )
+        self.api_key = os.getenv("GROQ_API_KEY")
+        self.client = Groq(api_key=self.api_key) if self.api_key else None
+        if self.client:
+            print(f"Using Groq inference model ({self.model_id})...")
+        else:
+            print(
+                "GROQ_API_KEY is not configured. Add it to the environment "
+                "or a local .env file to enable generative answers."
+            )
         print("TrustLink AI Assistant Ready with Hard Guardrails!\n")
+
+    @staticmethod
+    def _configuration_message() -> str:
+        return (
+            "TrustLink is ready, but generative answers are not configured. "
+            "Set GROQ_API_KEY in the Streamlit deployment secrets or in a local .env file, "
+            "then restart the app."
+        )
 
     @staticmethod
     def _query_language(user_query: str) -> str:
@@ -262,28 +271,21 @@ class TrustLinkChatbot:
             {"role": "user", "content": user_content},
         ]
 
-        prompt_str = self.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True
-        )
-        model_inputs = self.tokenizer([prompt_str], return_tensors="pt").to("cpu")
+        if self.client is None:
+            return self._configuration_message()
 
-        with torch.no_grad():
-            generated_ids = self.model.generate(
-                **model_inputs,
-                max_new_tokens=180,
-                do_sample=False,
-                repetition_penalty=1.15,
-                pad_token_id=self.tokenizer.pad_token_id,
+        try:
+            completion = self.client.chat.completions.create(
+                model=self.model_id,
+                messages=messages,
+                temperature=0.1,
+                max_tokens=180,
             )
+            raw_output = (completion.choices[0].message.content or "").strip()
+        except Exception as error:
+            print(f"Groq inference failed: {error}")
+            raw_output = ""
 
-        generated_ids = [
-            output_ids[len(input_ids) :]
-            for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
-        ]
-
-        raw_output = self.tokenizer.batch_decode(
-            generated_ids, skip_special_tokens=True
-        )[0].strip()
         formatted_output = TrustLinkGuardrail._format_bullets(raw_output)
         checked_output = TrustLinkGuardrail.sanitize_output(
             formatted_output,

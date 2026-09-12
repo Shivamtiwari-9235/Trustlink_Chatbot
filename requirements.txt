@@ -1,7 +1,6 @@
-faiss-cpu>=1.8.0
-sentence-transformers>=3.0.0
-streamlit>=1.36.0
-torch>=2.2.0
-torchvision>=0.17.0
-transformers>=4.45.0
-accelerate>=0.34.0
+streamlit
+sentence-transformers
+faiss-cpu
+groq
+python-dotenv
+requests
