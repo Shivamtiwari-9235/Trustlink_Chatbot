@@ -112,7 +112,11 @@ class TrustLinkChatbot:
         if self.api_key:
             from groq import Groq
 
-            self.client = Groq(api_key=self.api_key)
+            self.client = Groq(
+                api_key=self.api_key,
+                timeout=float(os.getenv("GROQ_TIMEOUT_SECONDS", "45")),
+                max_retries=0,
+            )
         if self.client:
             print(f"Using Groq inference model ({self.model_id})...")
         else:

@@ -2,7 +2,11 @@ import os
 import re
 
 import faiss
+import torch
 from sentence_transformers import SentenceTransformer
+
+torch.set_num_threads(int(os.getenv("TORCH_NUM_THREADS", "1")))
+torch.set_num_interop_threads(1)
 
 
 class LegalRetriever:
@@ -59,7 +63,10 @@ class LegalRetriever:
 
         # Multilingual model: Hindi, Hinglish, English teeno ko natively samajhta hai
         print("Loading Multilingual Embedding Model (Hindi + English)...")
-        self.embedder = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+        self.embedder = SentenceTransformer(
+            "paraphrase-multilingual-MiniLM-L12-v2",
+            device="cpu",
+        )
         self.chunks = []
         self.index = None
         self.build_index()

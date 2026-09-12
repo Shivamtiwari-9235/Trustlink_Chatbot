@@ -11,3 +11,7 @@ services:
         sync: false
       - key: TRUSTLINK_MODEL_ID
         value: llama-3.1-8b-instant
+      - key: TORCH_NUM_THREADS
+        value: "1"
+      - key: GROQ_TIMEOUT_SECONDS
+        value: "45"

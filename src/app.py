@@ -67,9 +67,11 @@ if prompt := st.chat_input("Apna sawal likhein (e.g. murder par kaun sa section 
 
     # Bot response generate karein
     with st.chat_message("assistant"):
-        with st.spinner("Statutory provisions verify ho rahe hain..."):
+        with st.status("Statutory provisions verify ho rahe hain...", expanded=False) as status:
             bot = load_trustlink_bot()
+            status.update(label="Generating a grounded answer...", state="running")
             response = bot.generate_response(prompt)
+            status.update(label="Answer ready", state="complete")
             st.markdown(response)
 
     st.session_state.messages.append({"role": "assistant", "content": response})
