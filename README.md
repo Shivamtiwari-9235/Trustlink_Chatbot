@@ -79,7 +79,7 @@ The first startup downloads `paraphrase-multilingual-MiniLM-L12-v2` for retrieva
 
 ## Render Deployment
 
-Create a Render Web Service connected to this repository with the repository root as its **Root Directory**. Leave the Root Directory field empty; do not set it to `src`.
+Create a Render Web Service connected to this repository with the repository root as its **Root Directory**. Set it to `.` or leave it empty; do not set it to `src`.
 
 The repository includes a `render.yaml` Blueprint configuration. You can deploy from that file, or configure the service manually with:
 
