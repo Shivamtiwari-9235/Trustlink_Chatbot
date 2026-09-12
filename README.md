@@ -1,12 +1,14 @@
 ---
-title: Trustlink Ai
-emoji: 📉
-colorFrom: yellow
-colorTo: green
-sdk: static
+title: TrustLink AI
+emoji: ⚖️
+colorFrom: blue
+colorTo: indigo
+sdk: streamlit
+sdk_version: 1.40.0
+app_file: app.py
 pinned: false
-license: apache-2.0
-short_description: TrustLink is an AI-powered legal and police assistance chatb
 ---
+
+# TrustLink: Police & Citizen Legal AI Assistant
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
